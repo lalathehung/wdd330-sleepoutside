@@ -9,8 +9,9 @@ export default class ProductDetails {
   }
 
   async init() {
+    console.log(`Initializing ProductDetails for ID: ${this.productId}`);
     this.product = await this.dataSource.findProductById(this.productId);
-    console.log("Product Details:", this.product); 
+    console.log("Product Details:", this.product);
     if (!this.product) {
       console.error("Error: Product not found for ID:", this.productId);
       document.querySelector("main")?.insertAdjacentHTML("afterbegin", "<p>Product not found.</p>");
@@ -20,6 +21,7 @@ export default class ProductDetails {
     const addToCartBtn = document.getElementById("addToCart");
     if (addToCartBtn) {
       addToCartBtn.addEventListener("click", this.addProductToCart.bind(this));
+      console.log("Add to Cart button event listener added");
     } else {
       console.error("Error: #addToCart button not found");
     }
@@ -27,11 +29,10 @@ export default class ProductDetails {
 
   addProductToCart() {
     const cartItems = getLocalStorage("so-cart") || [];
-    console.log("Before adding to cart:", cartItems); 
+    console.log("Before adding to cart:", cartItems);
     cartItems.push(this.product);
     setLocalStorage("so-cart", cartItems);
-    console.log("After adding to cart:", cartItems); 
-    // Update cart
+    console.log("After adding to cart:", cartItems);
     renderCartContents();
   }
 
@@ -52,15 +53,17 @@ function productDetailsTemplate(product) {
   if (h2) h2.textContent = product.NameWithoutBrand;
   if (h3) h3.textContent = product.Brand.Name;
   if (productImage) {
-    productImage.src = product.Image.replace('../images', '/public/images');
+    const imageSrc = product.Image.startsWith('../images') 
+      ? product.Image.replace('../images', '/images') 
+      : product.Image;
+    productImage.src = imageSrc;
     productImage.alt = product.NameWithoutBrand;
   }
   if (productPrice) productPrice.textContent = `$${product.FinalPrice}`;
   if (productColor) productColor.textContent = product.Colors[0].ColorName;
   if (productDesc) productDesc.innerHTML = product.DescriptionHtmlSimple;
-  if (addToCartBtn) addToCartBtn.dataset.id = product.Id;
+  if (addToCartBtn && product.Id) addToCartBtn.dataset.id = product.Id;
 
-  // Check elements
   [h2, h3, productImage, productPrice, productColor, productDesc, addToCartBtn].forEach((el, index) => {
     if (!el) console.error(`Error: Element at index ${index} not found`);
   });

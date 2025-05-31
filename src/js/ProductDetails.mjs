@@ -1,7 +1,7 @@
 import { getLocalStorage, setLocalStorage } from "./utils.mjs";
+import { renderCartContents } from "./cart.js";
 
 export default class ProductDetails {
-
   constructor(productId, dataSource) {
     this.productId = productId;
     this.product = {};
@@ -9,21 +9,30 @@ export default class ProductDetails {
   }
 
   async init() {
-    // use the datasource to get the details for the current product. findProductById will return a promise! use await or .then() to process it
     this.product = await this.dataSource.findProductById(this.productId);
-    // the product details are needed before rendering the HTML
+    console.log("Product Details:", this.product); 
+    if (!this.product) {
+      console.error("Error: Product not found for ID:", this.productId);
+      document.querySelector("main")?.insertAdjacentHTML("afterbegin", "<p>Product not found.</p>");
+      return;
+    }
     this.renderProductDetails();
-    // once the HTML is rendered, add a listener to the Add to Cart button
-    // Notice the .bind(this). This callback will not work if the bind(this) is missing. Review the readings from this week on "this" to understand why.
-    document
-      .getElementById("addToCart")
-      .addEventListener("click", this.addProductToCart.bind(this));
+    const addToCartBtn = document.getElementById("addToCart");
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener("click", this.addProductToCart.bind(this));
+    } else {
+      console.error("Error: #addToCart button not found");
+    }
   }
 
   addProductToCart() {
     const cartItems = getLocalStorage("so-cart") || [];
+    console.log("Before adding to cart:", cartItems); 
     cartItems.push(this.product);
     setLocalStorage("so-cart", cartItems);
+    console.log("After adding to cart:", cartItems); 
+    // Update cart
+    renderCartContents();
   }
 
   renderProductDetails() {
@@ -32,16 +41,27 @@ export default class ProductDetails {
 }
 
 function productDetailsTemplate(product) {
-  document.querySelector("h2").textContent = product.Brand.Name;
-  document.querySelector("h3").textContent = product.NameWithoutBrand;
+  const h2 = document.querySelector(".product-detail h2.divider");
+  const h3 = document.querySelector(".product-detail h3");
+  const productImage = document.querySelector(".product-detail img.divider");
+  const productPrice = document.querySelector(".product-card__price");
+  const productColor = document.querySelector(".product__color");
+  const productDesc = document.querySelector(".product__description");
+  const addToCartBtn = document.getElementById("addToCart");
 
-  const productImage = document.getElementById("productImage");
-  productImage.src = product.Image;
-  productImage.alt = product.NameWithoutBrand;
+  if (h2) h2.textContent = product.NameWithoutBrand;
+  if (h3) h3.textContent = product.Brand.Name;
+  if (productImage) {
+    productImage.src = product.Image.replace('../images', '/public/images');
+    productImage.alt = product.NameWithoutBrand;
+  }
+  if (productPrice) productPrice.textContent = `$${product.FinalPrice}`;
+  if (productColor) productColor.textContent = product.Colors[0].ColorName;
+  if (productDesc) productDesc.innerHTML = product.DescriptionHtmlSimple;
+  if (addToCartBtn) addToCartBtn.dataset.id = product.Id;
 
-  document.getElementById("productPrice").textContent = product.FinalPrice;
-  document.getElementById("productColor").textContent = product.Colors[0].ColorName;
-  document.getElementById("productDesc").innerHTML = product.DescriptionHtmlSimple;
-
-  document.getElementById("addToCart").dataset.id = product.Id;
+  // Check elements
+  [h2, h3, productImage, productPrice, productColor, productDesc, addToCartBtn].forEach((el, index) => {
+    if (!el) console.error(`Error: Element at index ${index} not found`);
+  });
 }

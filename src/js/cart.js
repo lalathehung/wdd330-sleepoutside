@@ -29,7 +29,7 @@ function cartItemTemplate(item) {
     </a>
     <p class="cart-card__color">${item.Colors && item.Colors[0]?.ColorName || "Unknown"}</p>
     <p class="cart-card__quantity">qty: 1</p>
-    <p class="cart-card__price">  $${item.FinalPrice}</p>
+    <p class="cart-card__price">$${item.FinalPrice}</p>
   </li>`;
   return newItem;
 }

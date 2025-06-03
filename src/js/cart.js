@@ -2,10 +2,8 @@ import { getLocalStorage } from "./utils.mjs";
 
 export function renderCartContents() {
   const cartItems = getLocalStorage("so-cart") || [];
-  console.log("Cart Items:", cartItems);
   const productList = document.querySelector(".product-list");
   if (!productList) {
-    console.error("Error: .product-list element not found in cart page");
     return;
   }
   if (cartItems.length === 0 || !Array.isArray(cartItems)) {
@@ -19,8 +17,8 @@ export function renderCartContents() {
 }
 
 function cartItemTemplate(item) {
-  const imageSrc = item.Image.startsWith('../images') 
-    ? item.Image.replace('../images', '/images') 
+  const imageSrc = item.Image.startsWith("../images")
+    ? item.Image.replace("../images", "/images")
     : item.Image;
   const newItem = `<li class="cart-card divider">
     <a href="/product_pages/?product=${item.Id}" class="cart-card__image">
@@ -29,14 +27,13 @@ function cartItemTemplate(item) {
     <a href="/product_pages/?product=${item.Id}">
       <h2 class="card__name">${item.Name}</h2>
     </a>
-    <p class="cart-card__color">${item.Colors && item.Colors[0]?.ColorName || 'Unknown'}</p>
+    <p class="cart-card__color">${item.Colors && item.Colors[0]?.ColorName || "Unknown"}</p>
     <p class="cart-card__quantity">qty: 1</p>
-    <p class="cart-card__price">$${item.FinalPrice}</p>
+    <p class="cart-card__price">  $${item.FinalPrice}</p>
   </li>`;
   return newItem;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Cart page loaded, rendering contents");
   renderCartContents();
 });

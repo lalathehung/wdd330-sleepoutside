@@ -1,14 +1,16 @@
-import ProductData from "./ProductData.mjs";
-import ProductList from "./ProductList.mjs";
 
-function initializeProductList() {
-  const dataSource = new ProductData("tents");
-  const element = document.querySelector(".product-list");
-  if (!element) {
-    return;
-  }
-  const productList = new ProductList("tents", dataSource, element);
-  productList.init();
-}
+import { loadHeaderFooter } from "./utils.mjs";
+import Modal from "./modal.mjs";
 
-initializeProductList();
+// Load the header and footer
+loadHeaderFooter();
+
+// Show Modal
+const title = "🎁 Register Now & Win! 🎁";
+const message =
+  "Sign up on your first visit and get a chance to win premium camping gear – tents, sleeping bags, and more! 🏕️";
+const modal = new Modal(title, message, true);
+modal.ShowModal();
+
+
+

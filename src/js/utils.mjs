@@ -112,8 +112,7 @@ export function cartSuperscript() {
 
   // Get number of items in cart
   const cartItems = getLocalStorage("so-cart") || [];
-  const numCartItems = cartItems.reduce((acc, item) => acc + item.Qtd, 0);
-  // console.log(cartItems);
+  const numCartItems = cartItems.length;
 
   //hide superscript if no items in cart from hide css class, else show num of items
   if (numCartItems === 0) {
@@ -121,11 +120,26 @@ export function cartSuperscript() {
   } else {
     cartCountElement.classList.remove("hide");
     cartCountElement.textContent = numCartItems;
-    // Add the 'updated' class to trigger the animation
-    cartCountElement.classList.add("updated");
   }
-  // Remove the class after the animation ends
-  setTimeout(() => {
-    cartCountElement.classList.remove("updated");
-  }, 300);
+}
+
+export function alertMessage(message, scroll = true, duration = 3000) {
+  const alert = document.createElement("div");
+  alert.classList.add("alert");
+  alert.innerHTML = `<p>${message}</p><span>X</span>`;
+
+  alert.addEventListener("click", function (e) {
+    if (e.target.tagName == "SPAN") {
+      main.removeChild(this);
+    }
+  });
+  const main = document.querySelector("main");
+  main.prepend(alert);
+
+  if (scroll) window.scrollTo(0, 0);
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll(".alert");
+  alerts.forEach((alert) => document.querySelector("main").removeChild(alert));
 }

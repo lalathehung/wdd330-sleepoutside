@@ -2,12 +2,16 @@ import { loadHeaderFooter } from "./utils.mjs";
 import CheckoutProcess from "./CheckoutProcess.mjs";
 
 loadHeaderFooter();
-
-const myCheckout = new CheckoutProcess("so-cart", ".checkout-summary");
+const myCheckout = new CheckoutProcess("so-cart");
 myCheckout.init();
 
-document.forms["checkout"].addEventListener("submit", (e) => {
+document
+  .querySelector("#zip")
+  .addEventListener("blur", myCheckout.calculateOrdertotal.bind(myCheckout));
+
+// listening for click on the button
+document.querySelector("#paySubmit").addEventListener("click", (e) => {
   e.preventDefault();
-  // e.target would contain our form in this case
+
   myCheckout.checkout();
 });

@@ -1,4 +1,4 @@
-import { getLocalStorage, setLocalStorage, cartSuperscript, alertMessage } from "./utils.mjs";
+import { getLocalStorage, setLocalStorage, cartSuperscript } from "./utils.mjs";
 export default class ProductDetails {
   constructor(productId, dataSource) {
     this.productId = productId;
@@ -8,8 +8,10 @@ export default class ProductDetails {
 
   async init() {
     const product = await this.dataSource.findProductById(this.productId);
+    this.product = product;
     // console.log(product);
     this.renderProductDetails(product);
+    this.handleBrandCrumbs();
 
     document
       .getElementById("addToCart")
@@ -27,18 +29,22 @@ export default class ProductDetails {
     } else {
       product.Qtd = 1;
       productList.push(product);
-      alertMessage(`${product.NameWithoutBrand} added to cart!`);
     }
 
     setLocalStorage("so-cart", productList);
-    
 
     // Load cartSuperscript
     cartSuperscript();
   }
 
+  handleBrandCrumbs() {
+    const breadcrumbsElement = document.querySelector("#breadcrumbs");
+    breadcrumbsElement.innerHTML = `<span class="path">${this.product.Category}</span>`
+  }
+
   // Added suggested retail price and list price on line 36-39
   renderProductDetails(product) {
+    const discountPercentage = ((product.SuggestedRetailPrice - product.ListPrice) / product.SuggestedRetailPrice) * 100;
     const detailsElement = document.querySelector(".product-detail");
     detailsElement.innerHTML = `
         <h3>${product.Brand.Name}</h3>
@@ -51,6 +57,9 @@ export default class ProductDetails {
     <p class="product-card__price">
       <span class="product-card__original-price">$${product.SuggestedRetailPrice.toFixed(2)}</span>
       <span class="product-card__discount-price">${product.ListPrice}</span>
+      <div class="discount-flag">
+        <span>Save ${discountPercentage.toFixed(0)}%</span>
+      </div>
     </p>
         <p class="product__color">${product.Colors[0].ColorName}</p>
 
